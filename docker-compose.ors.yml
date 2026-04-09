@@ -1,0 +1,19 @@
+# OpenRouteService auto-hébergé (optionnel).
+# Placez un fichier OSM .pbf dans ./ors-docker/ (voir doc ORS) puis :
+#   docker compose -f docker-compose.ors.yml up -d
+# L’API est généralement sur http://localhost:8080/ors — dans .env :
+#   OPENROUTESERVICE_BASE_URL=http://host.docker.internal:8080/ors   (app sur l’hôte)
+#   ou http://openrouteservice:8082/ors si l’app tourne dans le même réseau compose (ajuster le service name).
+
+services:
+  openrouteservice:
+    image: openrouteservice/openrouteservice:latest
+    restart: unless-stopped
+    ports:
+      - "8080:8082"
+    volumes:
+      - ./ors-docker:/home/ors/
+    environment:
+      # Ajustez la mémoire selon la machine (doc ORS Docker).
+      XMS: 2g
+      XMX: 4g

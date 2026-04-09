@@ -1,0 +1,45 @@
+# Triphive + PostgreSQL (développement / préprod).
+# Depuis ce dossier : docker compose up --build
+# Variables : copier .env.example vers .env ou définir OPENROUTESERVICE_* ci-dessous.
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: triphive
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d triphive"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/triphive
+      AUTH_SECRET: ${AUTH_SECRET:-change-me-in-production-min-32-chars}
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
+      AUTH_URL: ${AUTH_URL:-http://localhost:3000}
+      OPENROUTESERVICE_BASE_URL: ${OPENROUTESERVICE_BASE_URL:-https://api.openrouteservice.org}
+      OPENROUTESERVICE_API_KEY: ${OPENROUTESERVICE_API_KEY:-}
+      OPENROUTESERVICE_PROFILE: ${OPENROUTESERVICE_PROFILE:-foot-walking}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

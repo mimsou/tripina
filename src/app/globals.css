@@ -1,0 +1,123 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-terrain-night: #0d1117;
+  --color-terrain-deep: #111827;
+  --color-terrain-surface: #1c2333;
+  --color-terrain-mist: #f5f3ee;
+  --color-terrain-stone: #e8e3d8;
+
+  --color-trail: #e85d04;
+  --color-trail-glow: #fb8500;
+  --color-summit: #2d6a4f;
+  --color-sky: #0077b6;
+  --color-sunrise: #ffb703;
+  --color-snow: #f8f9fa;
+
+  --font-display: "Cabinet Grotesk", system-ui, sans-serif;
+  --font-body: var(--font-body-var), system-ui, sans-serif;
+  --font-mono: var(--font-mono-var), ui-monospace, monospace;
+
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 40px;
+  --space-2xl: 64px;
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+
+  --blur-glass: blur(20px) saturate(180%);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+  --shadow-elevated: 0 16px 48px rgba(0, 0, 0, 0.16);
+
+  --background: var(--color-terrain-mist);
+  --foreground: var(--color-terrain-night);
+}
+
+.dark {
+  --background: var(--color-terrain-night);
+  --foreground: var(--color-terrain-mist);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-body);
+  font-feature-settings: "rlig" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-display);
+  font-feature-settings: "ss01" on;
+}
+
+/* MapLibre / OpenFreeMap: keep default attribution (OSM + MapLibre). */
+
+@keyframes map-placement-breath {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.72;
+  }
+}
+
+.animate-map-placement-breath {
+  animation: map-placement-breath 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-map-placement-breath {
+    animation: none;
+    opacity: 0.5;
+  }
+}
+
+@keyframes map-bubble-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.map-stop-bubble-outer {
+  animation: map-bubble-float 3.2s ease-in-out infinite;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.2));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-stop-bubble-outer {
+    animation: none;
+  }
+}

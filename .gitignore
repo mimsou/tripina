@@ -1,0 +1,14 @@
+node_modules
+.next
+# Keep environment variables out of version control
+.env
+
+# Données volumineuses ORS auto-hébergé (fichiers .pbf, etc.)
+ors-docker/*
+!ors-docker/.gitkeep
+
+/generated/prisma
+
+# Local stop images (dev upload API)
+public/uploads/stops/*
+!public/uploads/stops/.gitkeep
