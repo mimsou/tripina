@@ -1,0 +1,66 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+# Racine Git = ce dossier (triphive). Avant prod : `npx prisma migrate deploy` (shell Render ou CI).
+#
+# OpenRouteService : 2e service web (docker/ors) — Spring écoute sur $PORT (entrypoint-render.sh).
+# ORS est gourmand (RAM, disque OSM) : ajustez plan / disk / XMS / XMX ; données .pbf sur le disque.
+#
+# ORS hébergé ailleurs : supprimez triphive-ors et mettez OPENROUTESERVICE_BASE_URL sur l’app.
+
+services:
+  - type: web
+    name: triphive-ors
+    runtime: docker
+    dockerfilePath: ./docker/ors/Dockerfile
+    dockerContext: ./docker/ors
+    plan: standard
+    healthCheckPath: /ors/v2/health
+    disk:
+      name: ors-data
+      mountPath: /home/ors
+      sizeGB: 20
+    envVars:
+      - key: REBUILD_GRAPHS
+        value: "False"
+      - key: CONTAINER_LOG_LEVEL
+        value: INFO
+      - key: XMS
+        value: 2g
+      - key: XMX
+        value: 4g
+
+  - type: web
+    name: triphive
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: starter
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: triphive-db
+          property: connectionString
+      - key: AUTH_SECRET
+        generateValue: true
+      - key: NEXTAUTH_URL
+        sync: false
+      - key: AUTH_URL
+        sync: false
+      - key: OPENROUTESERVICE_HOSTPORT
+        fromService:
+          name: triphive-ors
+          type: web
+          property: hostport
+      - key: OPENROUTESERVICE_PROFILE
+        value: foot-walking
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+
+databases:
+  - name: triphive-db
+    databaseName: triphive
+    user: triphive
